@@ -44,6 +44,7 @@ public class TestService {
             //the probability that the service failed
             this.numberOfSuccessfulAttempts++;
         }
+        System.out.println("Number fetched from db = " +  result.values());
         System.out.println("Number of accesses = " + this.numberOfAccesses);
         System.out.println("Number of successful attempts = " + this.numberOfSuccessfulAttempts);
         System.out.println("Number of failure attempts = " + this.numberOfFailureAttempts);
