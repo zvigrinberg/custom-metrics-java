@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.redhat.examples</groupId>
-	<artifactId>custom-metrics-java</artifactId>
+	<artifactId>custom-metrics-plain-java</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>custom-metrics-demo</name>
 	<description>Demo project for exporting metrics using micrometer</description>
@@ -44,10 +44,11 @@
 	</dependencies>
 	<build>
 		<plugins>
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
-			</plugin>
+<!--			uncomment if you want a thin jar in addition -->
+<!--			<plugin>-->
+<!--				<artifactId>maven-jar-plugin</artifactId>-->
+<!--				<version>2.4</version>-->
+<!--			</plugin>-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -76,8 +77,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>8</source>
-					<target>8</target>
+					<source>11</source>
+					<target>11</target>
 				</configuration>
 			</plugin>
 		</plugins>

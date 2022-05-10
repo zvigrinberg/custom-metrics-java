@@ -21,9 +21,10 @@ public class BookingService {
             bookingService= new BookingService();
 
             bookingService.numberOfBookings = Counter.builder("number_of_bookings")
-                    .register(prometheusMeterRegistry);
-                        bookingService.amountOfMoney = Counter.builder("amount_of_money")
-                    .register(prometheusMeterRegistry);
+                                                     .register(prometheusMeterRegistry);
+
+            bookingService.amountOfMoney = Counter.builder("amount_of_money")
+                                                  .register(prometheusMeterRegistry);
 
         }
 

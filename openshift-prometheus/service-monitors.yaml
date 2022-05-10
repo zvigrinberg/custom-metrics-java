@@ -1,0 +1,53 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: prometheus-example-monitor
+  name: prometheus-example-manual
+  namespace: custom-metric-test
+spec:
+  endpoints:
+    - interval: 15s
+      targetPort: http
+      scheme: http
+
+  selector:
+    matchLabels:
+      app: prometheus-actuator-spring-boot
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: prometheus-example-monitor
+  name: prometheus-example-actuator
+  namespace: custom-metric-test
+spec:
+  endpoints:
+    - interval: 15s
+      targetPort: actuator
+      scheme: http
+      path: /actuator/prometheus
+
+  selector:
+    matchLabels:
+      app: prometheus-actuator-spring-boot
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: prometheus-example-monitor
+  name: prometheus-example-plain-java
+  namespace: custom-metric-test
+spec:
+  endpoints:
+    - interval: 15s
+      targetPort: http
+      scheme: http
+      path: /prometheus
+
+  selector:
+    matchLabels:
+      app: prometheus-plain-java
