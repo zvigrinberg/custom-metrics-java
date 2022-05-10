@@ -4,16 +4,18 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 
+@Slf4j
 public class JavaMicrometerApplication {
 
     public static void main(String[] args) {
-
+        log.info("Start of Demo Application - How to work with micrometer in plain-java and expose metrics to Prometheus");
         PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
         BookingService service = BookingService.getInstance(prometheusRegistry);
         try {
@@ -27,7 +29,7 @@ public class JavaMicrometerApplication {
             });
 
             server.createContext("/make-booking" , httpExchange -> {
-                        System.out.println("inside make booking");
+                        log.info("Handle request for /make-booking path");
                         String queryUrl = httpExchange.getRequestURI().getQuery();
                         Integer itemPos = queryUrl.indexOf("item=");
                         Integer amountPos = queryUrl.indexOf("amount=");
@@ -53,6 +55,7 @@ public class JavaMicrometerApplication {
                         String amountValue = amount[1];
                         if(amountValue.isEmpty() || !StringUtils.isNumeric(amountValue) || itemValue.isEmpty()) {
                             String badRequestResponse = "Input parameters are missing or malformed";
+                            log.error(badRequestResponse);
                             httpExchange.sendResponseHeaders(400, badRequestResponse.getBytes().length);
                             try (OutputStream os = httpExchange.getResponseBody()) {
                                 os.write(badRequestResponse.getBytes());
@@ -66,11 +69,14 @@ public class JavaMicrometerApplication {
                                 try (OutputStream os = httpExchange.getResponseBody()) {
                                     os.write(okResponse.getBytes());
                             }
+                            log.info(okResponse + " With parameters : item " + itemValue + " and amount=" + amountValue);
                         }
 
                 });
 
             new Thread(server::start).start();
+            log.info("Server Started");
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

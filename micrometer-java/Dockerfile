@@ -5,7 +5,8 @@ RUN useradd appuser \
     && mkdir /java-app \
     && chown appuser /java-app
 
-COPY /target/*.jar /java-app/app.jar
+ARG JAR_NAME=*jar-with-dependencies.jar
+COPY /target/$JAR_NAME /java-app/app.jar
 RUN chmod -R ug+xrw /java-app
 USER appuser
 EXPOSE 8080
