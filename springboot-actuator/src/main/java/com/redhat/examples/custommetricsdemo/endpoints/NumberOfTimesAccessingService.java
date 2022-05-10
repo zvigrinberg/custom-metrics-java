@@ -17,9 +17,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Endpoint(id = "service-counter")
 public class NumberOfTimesAccessingService{
-    static final String totalNumberOfTimes = "number_of_times_reading_from_service";
-    static final String totalNumberOfFailures = "number_of_failure_attempts";
-    static final String totalNumberOfSuccesses = "number_of_successful_attempts";
+    public static final String totalNumberOfTimes = "number_of_times_reading_from_service";
+    public static final String totalNumberOfFailures = "number_of_failure_attempts";
+    public static final String totalNumberOfSuccesses = "number_of_successful_attempts";
     private final TestService testService;
     @ReadOperation
     public EndpointResponse getMetric() {

@@ -3,7 +3,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     k8s-app: prometheus-example-monitor
-  name: prometheus-example-monitor-springboot
+  name: prometheus-example-manual
   namespace: custom-metric-test
 spec:
   endpoints:

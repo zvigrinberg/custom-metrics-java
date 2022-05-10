@@ -8,7 +8,7 @@ metadata:
   namespace: custom-metric-test
 spec:
   containers:
-  - image: quay.io/zgrinber/custom-metric:2
+  - image: quay.io/zgrinber/custom-metric:4
     imagePullPolicy: IfNotPresent
     name: custom-metric-demo
     ports:
