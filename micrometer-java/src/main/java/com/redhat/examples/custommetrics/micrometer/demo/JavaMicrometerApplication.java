@@ -6,6 +6,8 @@ import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -76,7 +78,24 @@ public class JavaMicrometerApplication {
                 });
 
             new Thread(server::start).start();
-            log.info("Server Started");
+
+//            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+//                private Logger log = LoggerFactory.getLogger("JavaMicrometerApplication.class");
+//                @Override
+//                public void run() {
+//                    log.info("Exiting Server, bye bye!");
+//                }
+//            }){
+//
+//            });
+
+            Runtime.getRuntime().addShutdownHook(new Thread( ()-> {
+                    Logger log = LoggerFactory.getLogger("JavaMicrometerApplication.class");
+                    log.info("Exiting Server, bye bye!");
+            }
+            ));
+
+
 
         } catch (IOException e) {
             throw new RuntimeException(e);
