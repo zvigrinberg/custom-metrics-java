@@ -128,5 +128,5 @@
    15. See all endpoints that we created and defined, which are being pulled and scraped by prometheus 
    ![sample](./pictures/prometheus-ui2.png)
    16. Check actual metric Data on Prometheus UI, for example, we defined a demo metric
-       called 'amount_of_money_total' and how its value changed over time:
+       called `amount_of_money_total` and how its value changed over time:
    ![sample](./pictures/prometheus-ui3.png)   
