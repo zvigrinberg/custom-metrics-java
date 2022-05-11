@@ -1,0 +1,53 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: prometheus-actuator-spring-boot
+  name: custom-metric-demo
+  namespace: custom-metric-test
+spec:
+  host: custom-metric-demo-custom-metric-test.apps.tem-lab01.fsi.rhecoeng.com
+  port:
+    targetPort: 8081
+  to:
+    kind: Service
+    name: custom-metric-demo
+    weight: 100
+  wildcardPolicy: None
+
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: prometheus-actuator-spring-boot
+  name: custom-metric-demo-management
+  namespace: custom-metric-test
+spec:
+  host: custom-metric-demo-management-custom-metric-test.apps.tem-lab01.fsi.rhecoeng.com
+  port:
+    targetPort: 9090
+  to:
+    kind: Service
+    name: custom-metric-demo-management
+    weight: 100
+  wildcardPolicy: None
+
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: prometheus-plain-java
+  name: custom-metric-demo-plain-java
+  namespace: custom-metric-test
+spec:
+  host: custom-metric-demo-plain-java-custom-metric-test.apps.tem-lab01.fsi.rhecoeng.com
+  port:
+    targetPort: 8080
+  to:
+    kind: Service
+    name: custom-metric-demo-plain-java
+    weight: 100
+  wildcardPolicy: None
+

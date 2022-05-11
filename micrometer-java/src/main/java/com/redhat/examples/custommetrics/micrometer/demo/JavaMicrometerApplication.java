@@ -63,6 +63,8 @@ public class JavaMicrometerApplication {
                             try (OutputStream os = httpExchange.getResponseBody()) {
                                 os.write(badRequestResponse.getBytes());
                             }
+                            Exception general_exception_test = new Exception("General exception test");
+                            log.error("General error example",general_exception_test);
                         }
                         else
                         {
