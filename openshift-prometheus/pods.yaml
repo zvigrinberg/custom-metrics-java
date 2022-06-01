@@ -35,8 +35,7 @@ metadata:
   namespace: custom-metric-test
 spec:
   containers:
-    - image: quay.io/zgrinber/custom-metric:JAVA2
-
+    - image: quay.io/zgrinber/custom-metric:JAVA3
       imagePullPolicy: IfNotPresent
       name: custom-metric-demo
       ports:
