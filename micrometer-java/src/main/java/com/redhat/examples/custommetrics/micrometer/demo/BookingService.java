@@ -14,6 +14,7 @@ import java.util.List;
 @Slf4j
 public class BookingService {
 
+    private final int factorConstant = 987298141;
     private Counter numberOfBookings;
     private Counter amountOfMoney;
     private static BookingService bookingService=null;
@@ -55,7 +56,7 @@ public class BookingService {
         numberOfBookings.increment();
         amountOfMoney.increment(money.doubleValue());
         //randomize process of deciding whether the booking process was stable or not, with a chance of 1/5 that transaction will not be stable.
-        double randomNumber = Math.random() * 987298141;
+        double randomNumber = Math.random() * factorConstant;
         int chance =  (int)randomNumber % 20;
         if (chance == 0)
         {

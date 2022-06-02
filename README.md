@@ -129,4 +129,44 @@
    ![sample](./pictures/prometheus-ui2.png)
    16. Check actual metric Data on Prometheus UI, for example, we defined a demo metric
        called `amount_of_money_total` and how its value changed over time:
-   ![sample](./pictures/prometheus-ui3.png)   
+   ![sample](./pictures/prometheus-ui3.png)
+   
+#### Connect User-Workload Prometheus in Openshift as Data Source in Grafana
+1. First, need to fetch the secret that contains the TOKEN for accessing Prometheus user-workloads instance:
+```shell
+[zgrinber@zgrinber ~]$ SECRET=`oc get secret -n openshift-user-workload-monitoring | grep  prometheus-user-workload-token | head -n 1 | awk '{print $1 }'`
+```
+2. Now extract and decode the token itself out of the secret we got:
+```shell
+[zgrinber@zgrinber ~]$ TOKEN=`echo $(oc get secret $SECRET -n openshift-user-workload-monitoring -o json | jq -r '.data.token') | base64 -d`
+```
+3. Get the route of Thanos querier(implementor of the prometheus API):
+```shell
+[zgrinber@zgrinber ~]$ THANOS_QUERIER_HOST=`oc get route thanos-querier -n openshift-monitoring -o json | jq -r '.spec.host'`
+```
+4. Verify that all 3 environment variables populated, as expected.
+```shell
+[zgrinber@zgrinber ~]$ echo secret=$SECRET ; echo ; echo  token=$TOKEN  ; echo ; echo thanos-route=$THANOS_QUERIER_HOST
+```
+5. lookup for a granfana instance that you have on it all permissions, and get its route first:
+```shell
+[zgrinber@zgrinber ~]$  oc get route -A | grep grafana
+monitoring-documenting               grafana-route                                             grafana-route-monitoring-documenting.apps.tem-lab01.fsi.rhecoeng.com               /                             grafana-service                       3000          edge                   None
+monitoring-poc                       grafana                                                   grafana-monitoring-poc.apps.tem-lab01.fsi.rhecoeng.com                                                           grafana-service                       grafana                              None
+openshift-monitoring                 grafana                                                   grafana-openshift-monitoring.apps.tem-lab01.fsi.rhecoeng.com                                                     grafana                               https         reencrypt/Redirect     None
+```
+6. Take the appropriate route, and Access it through a web browser, after logging in,
+   Go to Configuration menu on the left panel-->Click on Data
+   source--> click on add data source--> Choose Prometheus, and fill in the fields according
+   to the following, and afterwards click on save & Test.
+```properties
+Name=Prometheus-user-workloads
+URL= Paste in the value of THANOS_QUERIER_HOST environment variable from section 3.
+Access=Server(default)
+Skip TLS Verify=On
+Custom HTTP Headers:
+  Header: Authorization
+  Value: Bearer $TOKEN(Where token is the environment variable defined in section 2, take its value and replace with $TOKEN).
+HTTP Method: GET
+```
+
