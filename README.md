@@ -165,8 +165,8 @@ URL= Paste in the value of THANOS_QUERIER_HOST environment variable from section
 Access=Server(default)
 Skip TLS Verify=On
 Custom HTTP Headers:
-  Header: Authorization
-  Value: Bearer $TOKEN(Where token is the environment variable defined in section 2, take its value and replace with $TOKEN).
-HTTP Method: GET
+  Header=Authorization
+  Value=Bearer $TOKEN(Where token is the environment variable defined in section 2, take its value and replace with $TOKEN).
+HTTP Method= GET
 ```
 
