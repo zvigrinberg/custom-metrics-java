@@ -1,0 +1,20 @@
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDataSource
+metadata:
+  name: prometheus-user-workloads-datasource-new-one
+spec:
+  datasources:
+    - access: proxy
+      editable: true
+      isDefault: false
+      jsonData:
+        httpHeaderName1: 'Authorization'
+        httpMethod: GET
+        timeInterval: 10s
+        tlsSkipVerify: true
+      name: prometheus-user-workloads
+      secureJsonData:
+        httpHeaderValue1: 'Bearer TOKEN_PLACEHOLDER'
+      type: prometheus
+      url: 'https://thanos-querier-openshift-monitoring.apps.tem-lab01.fsi.rhecoeng.com'
+  name: prometheus-user-workloads-datasource-new-one
