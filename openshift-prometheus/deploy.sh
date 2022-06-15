@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 echo "Create new namespace..."
 echo
 oc new-project custom-metric-test

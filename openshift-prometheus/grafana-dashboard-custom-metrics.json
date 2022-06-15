@@ -23,7 +23,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus-user-workloads",
+      "datasource": "prometheus-user-workloads",
       "fieldConfig": {
         "defaults": {},
         "overrides": []
@@ -113,7 +113,7 @@
       }
     },
     {
-      "datasource": "Prometheus-user-workloads",
+      "datasource": "prometheus-user-workloads",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -177,7 +177,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus-user-workloads",
+      "datasource": "prometheus-user-workloads",
       "fieldConfig": {
         "defaults": {
           "unit": "short"
