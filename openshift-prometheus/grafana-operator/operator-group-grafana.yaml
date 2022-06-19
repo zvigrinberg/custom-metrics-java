@@ -3,7 +3,7 @@ kind: OperatorGroup
 metadata:
   annotations:
     olm.providedAPIs: Grafana.v1alpha1.integreatly.org,GrafanaDashboard.v1alpha1.integreatly.org,GrafanaDataSource.v1alpha1.integreatly.org,GrafanaNotificationChannel.v1alpha1.integreatly.org
-  generateName: custom-metric-test-
+  name: custom-metric-test
   namespace: custom-metric-test
 spec:
   targetNamespaces:
