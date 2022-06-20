@@ -1,0 +1,15 @@
+apiVersion: operators.coreos.com/v1alpha1 
+kind: CatalogSource 
+metadata: 
+  name: old-community-catalog 
+  namespace: openshift-marketplace 
+  labels:
+    installIndexImageForGrafanaOldVersion: true      
+spec: 
+  sourceType: grpc 
+  image: registry:port/namespace/redhat-operator-index:v4.7 
+  displayName: My Operator Catalog 
+  publisher: publisher_name 
+  updateStrategy: 
+    registryPoll: 
+      interval: 30m 

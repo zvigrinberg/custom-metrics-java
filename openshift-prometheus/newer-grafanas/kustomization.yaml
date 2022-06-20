@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ./../grafana-operator
+
+
+patches:
+  #-# path: patch-catalog-source.yaml
+# target:
+#  group: operators.coreos.com
+#    version: v1alpha1
+#    kind: CatalogSource
+
+- patch: |-
+    - op: replace
+      path: /spec/channel
+      value: v4
+  target:
+    group: operators.coreos.com
+    version: v1alpha1
+    kind: Subscription
+    
