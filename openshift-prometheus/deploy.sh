@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 installGrafanaOperator=$1
 installLatestGrafana=$2
 deployGrafanaInstance=$3

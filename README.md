@@ -132,6 +132,7 @@
    ![sample](./pictures/prometheus-ui3.png)
    
 #### Connect User-Workload Prometheus in Openshift as Data Source in Grafana
+##### Repeated action
 1. First, need to fetch the secret that contains the TOKEN for accessing Prometheus user-workloads instance:
 ```shell
 [zgrinber@zgrinber ~]$ SECRET=`oc get secret -n openshift-user-workload-monitoring | grep  prometheus-user-workload-token | head -n 1 | awk '{print $1 }'`
@@ -169,4 +170,170 @@ Custom HTTP Headers:
   Value=Bearer $TOKEN(Where token is the environment variable defined in section 2, take its value and replace with $TOKEN).
 HTTP Method= GET
 ```
+#### Deploying grafana Using Operator on openshift cluster/Kubernetes cluster:
+  - Prerequisites:
+     
+      a. OLM installed on cluster(on openshift it's installed by default), if it does not exists, can install it using the
+         the Operator-SDK cli, before that you need to connect to the target cluster:
+     ```shell
+    operator-sdk olm install
+     ```
+     b. Kubernetes Version v1.21.x(if has kubernetes version beyond v1.22.x inclusive, need to deploy a newer version of the grafana operator, which is faulty).
+     c. you have cluster-admin privileges on the cluster(needed to install operators). 
+
+1. Create Operator Group and define targetNamespace when you want to operator to be installed.
+```shell
+[zgrinber@zgrinber grafana-operator]$ cat > operator-group-grafana.yaml << EOF
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  annotations:
+    olm.providedAPIs: Grafana.v1alpha1.integreatly.org,GrafanaDashboard.v1alpha1.integreatly.org,GrafanaDataSource.v1alpha1.integreatly.org,GrafanaNotificationChannel.v1alpha1.integreatly.org
+  name: custom-metric-test
+  namespace: custom-metric-test
+spec:
+  targetNamespaces:
+  - custom-metric-test
+
+EOF
+
+[zgrinber@zgrinber grafana-operator]$ oc apply -f operator-group-grafana.yaml
+```
+2. Create a CatalogSource with the index image that contains the bundle manifests of older version of grafana operator:
+```shell
+cat > old-catalog-source.yaml << EOF
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: old-community-catalog
+  namespace: openshift-marketplace
+spec:
+  sourceType: grpc
+  secrets:
+    - 11009103-zvi-pull-secret       
+  image: registry.redhat.io/redhat/community-operator-index:v4.8
+  displayName: Community Operator Catalog old
+  publisher: RedHat
+  updateStrategy:
+    registryPoll:
+      interval: 30m
+EOF
+oc apply -f old-catalog-source.yaml
+```
+
+**_Note: Need to create a secret in the namespace that the catalogSource will be installed on it.
+In case registry.redhat.io, you can [Generate a service account token here](https://access.redhat.com/terms-based-registry/), all you have to do is to login
+with your redhat subscription/credentials, and it self explanitory how to create the service account , token and secret._**
+     
+3. Create subscription to Install Grafana Operator(version v3.10.3, in last version 4.4.1,the grafanaDashboard importing using CR doesn't work), and wait for the operator deployment to be up and ready.
+```shell
+[zgrinber@zgrinber grafana-operator]$ cat > grafana-operator-subscription.yaml << EOF
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  labels:
+    operators.coreos.com/grafana-operator.custom-metric-test: ""
+  name: grafana-operator
+  namespace: custom-metric-test
+
+spec:
+  channel: alpha
+  installPlanApproval: Automatic
+  name: grafana-operator
+  source: old-community-catalog
+  sourceNamespace: openshift-marketplace
+  
+EOF
+[zgrinber@zgrinber grafana-operator]$ oc apply -f grafana-operator-subscription.yaml
+```
+4. Create a grafana CR(CustomResource) on the namespace, and wait that the grafana-deployment pods will be up and ready:
+```shell
+cat > grafana-instance.yaml << EOF
+apiVersion: integreatly.org/v1alpha1
+kind: Grafana
+metadata:
+  name: example-grafana
+  namespace: custom-metric-test
+spec:
+  ingress:
+    enabled: false
+  config:
+    log:
+      mode: "console"
+      level: "warn"
+    auth:
+      disable_login_form: False
+      disable_signout_menu: True
+    auth.anonymous:
+      enabled: False
+  service:
+    name: "grafana-service"
+    labels:
+      app: "grafana"
+      type: "grafana-service"
+  dashboardLabelSelector:
+    - matchExpressions:
+        - { key: app, operator: In, values: [ grafana ] }
+  # initResources:
+  #   # Optionally specify initResources
+  #   limits:
+  #     cpu: 1000m
+  #     memory: 512Mi
+  #   requests:
+  #     cpu: 250m
+  #     memory: 128Mi
+  resources:
+    # Optionally specify container resources
+    limits:
+      cpu: 2000m
+      memory: 8000Mi
+    requests:
+      cpu: 100m
+      memory: 200Mi
+EOF
+oc apply -f grafana-instance.yaml
+```
+5. Create A GrafanaDataSource CR to pull data from user-workloads Prometheus:
+
+     i. Repeat [steps 1-2 ](#repeated-action) to get TOKEN.
+
+     ii. create GrafanaDataSource manifest in file:
+    ```shell
+    [zgrinber@zgrinber tryout]$ cat > grafana-data-source.yaml << EOF
+    apiVersion: integreatly.org/v1alpha1
+    kind: GrafanaDataSource
+    metadata:
+      name: prometheus-user-workloads-datasource-new-one
+    spec:
+      datasources:
+        - access: proxy
+          editable: true
+          isDefault: false
+          jsonData:
+            httpHeaderName1: 'Authorization'
+            httpMethod: GET
+            timeInterval: 10s
+            tlsSkipVerify: true
+          name: prometheus-user-workloads
+          secureJsonData:
+            httpHeaderValue1: 'Bearer TOKEN_PLACEHOLDER'
+          type: prometheus
+          url: 'https://thanos-querier-openshift-monitoring.apps.tem-lab01.fsi.rhecoeng.com'
+      name: prometheus-user-workloads-datasource-new-one
+    EOF
+    ```
+     iii. Replace the token placeholder with the actual token ServiceAccount of Prometheus user workloads:
+     ```shell
+      sed 's/TOKEN_PLACEHOLDER/'""$TOKEN""'/g' grafana-data-source.yaml | oc apply -f - -n custom-metric-test
+     ``` 
+6. Create a GrafanaDashBoard Using its CR(Optional):
+```shell
+zgrinber@zgrinber openshift-prometheus]$ oc apply -f custom-java-metrics-dashboard.yaml
+```
+7. Expose a Route for grafana service so it'll be activated to enter GRAFANA UI through the client's web browser:
+```shell
+oc expose svc grafana-service
+``` 
+
+
 
