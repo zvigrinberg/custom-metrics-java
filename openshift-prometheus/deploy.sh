@@ -2,6 +2,7 @@
 set -x
 installGrafanaOperator=$1
 installLatestGrafana=$2
+deployGrafanaInstance=$3
 
 echo "Create new namespace..."
 echo
@@ -35,18 +36,21 @@ oc apply -f user-workload-monitoring-config.yaml
 echo "Create Service Monitors to let Prometheus pull new application Metrics:"
 echo
 oc apply -f service-monitors.yaml
-echo "Creating a grafana instance"
-echo
-oc apply -f grafana-instance.yaml
 
-READY_INDICATION=$(oc get deployment grafana-deployment | awk '{print $2}' | grep -v READY)
-
-while [ "$READY_INDICATION" != "1/1" ]; do
-    echo "$READY_INDICATION pods are ready, waiting..."
-    sleep 3
+if [[ "${deployGrafanaInstance}" = "true" ]]; then
+    echo "Creating a grafana instance"
+    echo
+    oc apply -f grafana-instance.yaml
+    echo "Waiting for grafana deployment instance to be up and ready"
     READY_INDICATION=$(oc get deployment grafana-deployment | awk '{print $2}' | grep -v READY)
-done
 
+    while [ "$READY_INDICATION" != "1/1" ]; do
+        echo "$READY_INDICATION pods are ready, waiting..."
+        sleep 4
+        READY_INDICATION=$(oc get deployment grafana-deployment | awk '{print $2}' | grep -v READY)
+    done    
+
+fi
 
 echo "Creating a datasource in grafana using the grafana operator and a grafanaDataSource CR instance:"
 echo
