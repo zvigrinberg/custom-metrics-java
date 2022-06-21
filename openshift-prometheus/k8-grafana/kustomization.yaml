@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ./addition
+- ../grafana-operator  
+
+patches:
+
+- patch: |-
+    - op: replace
+      path: /spec/source
+      value: operatorhubio-catalog
+
+    - op: replace
+      path: /spec/sourceNamespace
+      value: olm
+  target:
+    group: operators.coreos.com
+    version: v1alpha1
+    kind: Subscription
+    

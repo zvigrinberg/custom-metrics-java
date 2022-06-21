@@ -1,11 +1,23 @@
 #!/bin/bash
 set -x
+installGrafanaOperator=$1
+installLatestGrafana=$2
+
 echo "Create new namespace..."
 echo
 oc new-project custom-metric-test
-echo "Deploy Grafana operator"
-oc apply -f grafana-operator/operator-group-grafana.yaml 
-oc apply -f grafana-operator/grafana-operator-subscription.yaml
+echo
+if [[ "${installGrafanaOperator}" == "true" ]]; then
+    echo "Installing grafana operator..."
+    if [[ "${installLatestGrafana}" == "true" ]]; then
+        echo "Installing latest version..."
+        kustomize build newer-grafanas | oc apply -f -
+    else
+        echo "Installing older version..."
+        kustomize build older-grafanas | oc apply -f -
+    fi
+fi
+
 sleep 5
 echo "Deploy pods on namespace..."
 echo
