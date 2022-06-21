@@ -49,7 +49,6 @@ if [[ "${deployGrafanaInstance}" = "true" ]]; then
         sleep 4
         READY_INDICATION=$(oc get deployment grafana-deployment | awk '{print $2}' | grep -v READY)
     done    
-
 fi
 
 echo "Creating a datasource in grafana using the grafana operator and a grafanaDataSource CR instance:"
