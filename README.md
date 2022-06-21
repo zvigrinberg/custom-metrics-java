@@ -334,6 +334,7 @@ zgrinber@zgrinber openshift-prometheus]$ oc apply -f custom-java-metrics-dashboa
 ```shell
 oc expose svc grafana-service
 ``` 
+8.All of the above procedure can be automated using [this script](./openshift-prometheus/deploy.sh)
 
 
 
